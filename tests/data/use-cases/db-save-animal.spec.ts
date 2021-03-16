@@ -1,6 +1,7 @@
 import { DbSaveAnimal } from '@/data/use-cases'
 import { SaveAnimal } from '@/domain/use-cases'
 import { SaveAnimalRepoSpy } from '@/tests/data/mocks'
+import { throwError } from '@/tests/domain/helpers'
 import { mockSaveAnimalParams } from '@/tests/domain/mocks'
 
 type SutTypes = {
@@ -28,5 +29,12 @@ describe('DbSaveAnimal use case', () => {
     const { sut, saveAnimalRepoSpy } = makeSut()
     await sut.save(saveAnimalParams)
     expect(saveAnimalRepoSpy.params).toEqual(saveAnimalParams)
+  })
+
+  test('Should throws if SaveAnimalRepo throws', async () => {
+    const { sut, saveAnimalRepoSpy } = makeSut()
+    jest.spyOn(saveAnimalRepoSpy, 'save').mockImplementationOnce(throwError)
+    const promise = sut.save(saveAnimalParams)
+    await expect(promise).rejects.toThrow()
   })
 })
