@@ -37,4 +37,10 @@ describe('DbSaveAnimal use case', () => {
     const promise = sut.save(saveAnimalParams)
     await expect(promise).rejects.toThrow()
   })
+
+  test('Should return AnimalModel on success', async () => {
+    const { sut, saveAnimalRepoSpy } = makeSut()
+    const animal = await sut.save(saveAnimalParams)
+    expect(animal).toEqual(saveAnimalRepoSpy.result)
+  })
 })
