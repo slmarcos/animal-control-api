@@ -7,7 +7,6 @@ export class DbSaveAnimal implements SaveAnimal {
   ) { }
 
   async save (data: SaveAnimal.Params): Promise<SaveAnimal.Result> {
-    await this.saveAnimalRepo.save(data)
-    return null as any
+    return this.saveAnimalRepo.save(data)
   }
 }
