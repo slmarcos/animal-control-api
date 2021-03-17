@@ -1,7 +1,8 @@
 import { SaveAnimalController } from '@/presentation/controllers'
-import { badRequest } from '@/presentation/helpers'
-import { mockSaveAnimalParams } from '@/tests/domain/mocks'
+import { badRequest, ok } from '@/presentation/helpers'
 import { SaveAnimalSpy, ValidatorSpy } from '@/tests/presentation/mocks'
+
+import faker from 'faker'
 
 type SutTypes = {
   sut: SaveAnimalController
@@ -9,7 +10,14 @@ type SutTypes = {
   saveAnimalSpy: SaveAnimalSpy
 }
 
-let mockRequest: SaveAnimalController.Request
+const mockRequest = (): SaveAnimalController.Request => ({
+  age: faker.random.number(99),
+  name: faker.name.firstName(),
+  type: faker.random.word(),
+  weight: faker.random.float(1000)
+})
+
+let request: SaveAnimalController.Request
 
 const makeSut = (): SutTypes => {
   const validatorSpy = new ValidatorSpy()
@@ -24,19 +32,36 @@ const makeSut = (): SutTypes => {
 
 describe('SaveAnimalController', () => {
   beforeEach(() => {
-    mockRequest = mockSaveAnimalParams()
+    request = mockRequest()
   })
 
   test('Should call Validator with correct params', async () => {
     const { sut, validatorSpy } = makeSut()
-    await sut.handle(mockRequest)
-    expect(validatorSpy.input).toEqual(mockRequest)
+    await sut.handle(request)
+    expect(validatorSpy.input).toEqual(request)
   })
 
   test('Should returns badRequest if Validator fails', async () => {
     const { sut, validatorSpy } = makeSut()
     validatorSpy.error = new Error()
-    const httpResponse = await sut.handle(mockRequest)
+    const httpResponse = await sut.handle(request)
     expect(httpResponse).toEqual(badRequest(validatorSpy.error))
+  })
+
+  test('Should call SaveAnimal with correct params', async () => {
+    const { sut, saveAnimalSpy } = makeSut()
+    await sut.handle(request)
+    expect(saveAnimalSpy.params).toEqual({
+      age: request.age,
+      name: request.name,
+      type: request.type,
+      weight: request.weight
+    })
+  })
+
+  test('Should returns ok and AnimalModel on success', async () => {
+    const { sut, saveAnimalSpy } = makeSut()
+    const response = await sut.handle(request)
+    expect(response).toEqual(ok(saveAnimalSpy.result))
   })
 })
