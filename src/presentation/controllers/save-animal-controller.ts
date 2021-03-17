@@ -1,5 +1,5 @@
 import { Controller, HttpResponse, Validator } from '@/presentation/protocols'
-import { badRequest } from '@/presentation/helpers'
+import { badRequest, ok } from '@/presentation/helpers'
 import { SaveAnimal } from '@/domain/use-cases'
 
 export class SaveAnimalController implements Controller {
@@ -13,7 +13,8 @@ export class SaveAnimalController implements Controller {
     if (error) {
       return badRequest(error)
     }
-    return null as any
+    const animal = await this.saveAnimal.save(request)
+    return ok(animal)
   }
 }
 
