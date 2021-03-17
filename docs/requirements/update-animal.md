@@ -6,6 +6,7 @@
   - [ ] Valida os campos campos obrigatórios
   - [ ] Atualiza o animal animal
   - [ ] Retorna os dados do animal com o código de status **200**
+  - [ ] Retorna **204** se não existir animal com o ID informado
 
 ## Falha
 ---
