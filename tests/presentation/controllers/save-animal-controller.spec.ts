@@ -1,13 +1,14 @@
 import { SaveAnimalController } from '@/presentation/controllers'
-import { badRequest, ok, serverError } from '@/presentation/helpers'
+import { badRequest, noContent, ok, serverError } from '@/presentation/helpers'
 import { throwError } from '@/tests/domain/helpers'
-import { SaveAnimalSpy, ValidatorSpy } from '@/tests/presentation/mocks'
+import { LoadAnimalByIdSpy, SaveAnimalSpy, ValidatorSpy } from '@/tests/presentation/mocks'
 
 import faker from 'faker'
 
 type SutTypes = {
   sut: SaveAnimalController
   validatorSpy: ValidatorSpy
+  loadAnimalByIdSpy: LoadAnimalByIdSpy
   saveAnimalSpy: SaveAnimalSpy
 }
 
@@ -24,10 +25,12 @@ let request: SaveAnimalController.Request
 const makeSut = (): SutTypes => {
   const validatorSpy = new ValidatorSpy()
   const saveAnimalSpy = new SaveAnimalSpy()
-  const sut = new SaveAnimalController(validatorSpy, saveAnimalSpy)
+  const loadAnimalByIdSpy = new LoadAnimalByIdSpy()
+  const sut = new SaveAnimalController(validatorSpy, loadAnimalByIdSpy, saveAnimalSpy)
   return {
     sut,
     validatorSpy,
+    loadAnimalByIdSpy,
     saveAnimalSpy
   }
 }
@@ -48,6 +51,21 @@ describe('SaveAnimalController', () => {
     validatorSpy.error = new Error()
     const httpResponse = await sut.handle(request)
     expect(httpResponse).toEqual(badRequest(validatorSpy.error))
+  })
+
+  test('Should calls LoadAnimalById with correct params if animalId is provided', async () => {
+    const { sut, loadAnimalByIdSpy } = makeSut()
+    request.animalId = faker.random.uuid()
+    await sut.handle(request)
+    expect(loadAnimalByIdSpy.params).toEqual(request.animalId)
+  })
+
+  test('Should returns noContent if animalId is provided and LoadAnimalById returns null', async () => {
+    const { sut, loadAnimalByIdSpy } = makeSut()
+    loadAnimalByIdSpy.result = null
+    request.animalId = faker.random.uuid()
+    const httpResponse = await sut.handle(request)
+    expect(httpResponse).toEqual(noContent())
   })
 
   test('Should call SaveAnimal with correct params', async () => {
