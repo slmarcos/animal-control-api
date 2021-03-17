@@ -1,5 +1,5 @@
 import { Controller, HttpResponse, Validator } from '@/presentation/protocols'
-import { badRequest, ok } from '@/presentation/helpers'
+import { badRequest, ok, serverError } from '@/presentation/helpers'
 import { SaveAnimal } from '@/domain/use-cases'
 
 export class SaveAnimalController implements Controller {
@@ -9,12 +9,16 @@ export class SaveAnimalController implements Controller {
   ) { }
 
   async handle (request: SaveAnimalController.Request): Promise<SaveAnimalController.Result> {
-    const error = this.validator.validate(request)
-    if (error) {
-      return badRequest(error)
+    try {
+      const error = this.validator.validate(request)
+      if (error) {
+        return badRequest(error)
+      }
+      const animal = await this.saveAnimal.save(request)
+      return ok(animal)
+    } catch (error) {
+      return serverError(error)
     }
-    const animal = await this.saveAnimal.save(request)
-    return ok(animal)
   }
 }
 
