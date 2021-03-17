@@ -10,4 +10,4 @@
 ## Falha
 ---
   - [ ] Retorna erro **500** se ocorrer uma falha interna no servidor
-  - [ ] Retorna erro **400** com uma mensagem de erro se faltar algum campo
+  - [ ] Retorna erro **400** com uma mensagem de erro se faltar algum campo ou se for informado um valor inválido
