@@ -2,14 +2,14 @@ import { Controller, HttpResponse, Validator } from '@/presentation/protocols'
 import { badRequest, noContent, ok, serverError } from '@/presentation/helpers'
 import { LoadAnimalById, SaveAnimal } from '@/domain/use-cases'
 
-export class SaveAnimalController implements Controller {
+export class UpdateAnimalController implements Controller {
   constructor (
     private readonly validator: Validator,
     private readonly loadAnimalById: LoadAnimalById,
     private readonly saveAnimal: SaveAnimal
   ) { }
 
-  async handle (request: SaveAnimalController.Request): Promise<SaveAnimalController.Result> {
+  async handle (request: UpdateAnimalController.Request): Promise<UpdateAnimalController.Result> {
     try {
       const error = this.validator.validate(request)
       if (error) {
@@ -33,9 +33,9 @@ export class SaveAnimalController implements Controller {
   }
 }
 
-export namespace SaveAnimalController {
+export namespace UpdateAnimalController {
   export type Request = {
-    animalId?: string
+    animalId: string
     name: string
     age: number
     weight: number

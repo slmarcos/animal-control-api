@@ -1,4 +1,4 @@
-import { SaveAnimalController } from '@/presentation/controllers'
+import { UpdateAnimalController } from '@/presentation/controllers'
 import { badRequest, noContent, ok, serverError } from '@/presentation/helpers'
 import { throwError } from '@/tests/domain/helpers'
 import { LoadAnimalByIdSpy, SaveAnimalSpy, ValidatorSpy } from '@/tests/presentation/mocks'
@@ -6,27 +6,27 @@ import { LoadAnimalByIdSpy, SaveAnimalSpy, ValidatorSpy } from '@/tests/presenta
 import faker from 'faker'
 
 type SutTypes = {
-  sut: SaveAnimalController
+  sut: UpdateAnimalController
   validatorSpy: ValidatorSpy
   loadAnimalByIdSpy: LoadAnimalByIdSpy
   saveAnimalSpy: SaveAnimalSpy
 }
 
-const mockRequest = (animalId?: string): SaveAnimalController.Request => ({
-  animalId: animalId,
+const mockRequest = (): UpdateAnimalController.Request => ({
+  animalId: faker.random.uuid(),
   age: faker.random.number(99),
   name: faker.name.firstName(),
   type: faker.random.word(),
   weight: faker.random.float(1000)
 })
 
-let request: SaveAnimalController.Request
+let request: UpdateAnimalController.Request
 
 const makeSut = (): SutTypes => {
   const validatorSpy = new ValidatorSpy()
   const saveAnimalSpy = new SaveAnimalSpy()
   const loadAnimalByIdSpy = new LoadAnimalByIdSpy()
-  const sut = new SaveAnimalController(validatorSpy, loadAnimalByIdSpy, saveAnimalSpy)
+  const sut = new UpdateAnimalController(validatorSpy, loadAnimalByIdSpy, saveAnimalSpy)
   return {
     sut,
     validatorSpy,
@@ -35,7 +35,7 @@ const makeSut = (): SutTypes => {
   }
 }
 
-describe('SaveAnimalController', () => {
+describe('UpdateAnimalController', () => {
   beforeEach(() => {
     request = mockRequest()
   })
@@ -53,36 +53,21 @@ describe('SaveAnimalController', () => {
     expect(httpResponse).toEqual(badRequest(validatorSpy.error))
   })
 
-  test('Should calls LoadAnimalById with correct params if animalId is provided', async () => {
+  test('Should calls LoadAnimalById with correct params', async () => {
     const { sut, loadAnimalByIdSpy } = makeSut()
-    request.animalId = faker.random.uuid()
     await sut.handle(request)
     expect(loadAnimalByIdSpy.params).toEqual(request.animalId)
   })
 
-  test('Should returns noContent if animalId is provided and LoadAnimalById returns null', async () => {
+  test('Should returns noContent if LoadAnimalById returns null', async () => {
     const { sut, loadAnimalByIdSpy } = makeSut()
     loadAnimalByIdSpy.result = null
-    request.animalId = faker.random.uuid()
     const httpResponse = await sut.handle(request)
     expect(httpResponse).toEqual(noContent())
   })
 
   test('Should call SaveAnimal with correct params', async () => {
     const { sut, saveAnimalSpy } = makeSut()
-    await sut.handle(request)
-    expect(saveAnimalSpy.params).toEqual({
-      id: request.animalId,
-      age: request.age,
-      name: request.name,
-      type: request.type,
-      weight: request.weight
-    })
-  })
-
-  test('Should call SaveAnimal with correct params when animalId exists', async () => {
-    const { sut, saveAnimalSpy } = makeSut()
-    request.animalId = faker.random.uuid()
     await sut.handle(request)
     expect(saveAnimalSpy.params).toEqual({
       id: request.animalId,

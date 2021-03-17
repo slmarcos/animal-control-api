@@ -1,7 +1,7 @@
 import { RequiredFieldValidator, ValidatorComposite } from '@/validation/validators'
 import { Validator } from '@/presentation/protocols'
 
-export const makeSaveAnimalValidator = (): ValidatorComposite => {
+export const makeCreateAnimalValidator = (): ValidatorComposite => {
   const validators: Validator[] = []
   for (const field of ['name', 'age', 'weight', 'type']) {
     validators.push(new RequiredFieldValidator(field))

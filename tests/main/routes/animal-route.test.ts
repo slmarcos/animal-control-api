@@ -67,6 +67,21 @@ describe('Animal Routes', () => {
         })
     })
 
+    test('[PUT] Should returns status code 400 and invalid param error if invalid animalId is provided', async () => {
+      const animalId = 'any_invalid_id'
+      const mockRequest = {
+        age: 12,
+        type: faker.random.word(),
+        weight: 100
+      }
+      await request(app)
+        .put(`/api/animal/${animalId}`)
+        .send(mockRequest)
+        .expect(400, {
+          error: 'Invalid param: animalId'
+        })
+    })
+
     test('[PUT] Should returns noContent if animalId not exists', async () => {
       const animalId = mongoose.Types.ObjectId().toHexString()
       const mockRequest = {
