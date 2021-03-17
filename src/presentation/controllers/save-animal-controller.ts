@@ -1,4 +1,5 @@
 import { Controller, HttpResponse, Validator } from '@/presentation/protocols'
+import { badRequest } from '@/presentation/helpers'
 import { SaveAnimal } from '@/domain/use-cases'
 
 export class SaveAnimalController implements Controller {
@@ -7,8 +8,11 @@ export class SaveAnimalController implements Controller {
     private readonly saveAnimal: SaveAnimal
   ) { }
 
-  async handle (request: SaveAnimalController.Request): Promise<SaveAnimalController.Request> {
-    this.validator.validate(request)
+  async handle (request: SaveAnimalController.Request): Promise<SaveAnimalController.Result> {
+    const error = this.validator.validate(request)
+    if (error) {
+      return badRequest(error)
+    }
     return null as any
   }
 }
