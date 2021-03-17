@@ -5,4 +5,5 @@ import { Router } from 'express'
 
 export default (router: Router): void => {
   router.post('/animal', adaptRoute(makeSaveAnimalController()))
+  router.put('/animal/:animalId', adaptRoute(makeSaveAnimalController()))
 }

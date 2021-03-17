@@ -1,10 +1,11 @@
 import { Controller, HttpResponse, Validator } from '@/presentation/protocols'
-import { badRequest, ok, serverError } from '@/presentation/helpers'
-import { SaveAnimal } from '@/domain/use-cases'
+import { badRequest, noContent, ok, serverError } from '@/presentation/helpers'
+import { LoadAnimalById, SaveAnimal } from '@/domain/use-cases'
 
 export class SaveAnimalController implements Controller {
   constructor (
     private readonly validator: Validator,
+    private readonly loadAnimalById: LoadAnimalById,
     private readonly saveAnimal: SaveAnimal
   ) { }
 
@@ -14,12 +15,18 @@ export class SaveAnimalController implements Controller {
       if (error) {
         return badRequest(error)
       }
-      const { animalId: id, ...params } = request
-      const animal = await this.saveAnimal.save({
-        id,
+      const { animalId, ...params } = request
+      if (animalId) {
+        const animal = await this.loadAnimalById.load(animalId)
+        if (!animal) {
+          return noContent()
+        }
+      }
+      const result = await this.saveAnimal.save({
+        id: animalId,
         ...params
       })
-      return ok(animal)
+      return ok(result)
     } catch (error) {
       return serverError(error)
     }
