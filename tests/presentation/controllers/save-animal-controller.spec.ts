@@ -1,5 +1,6 @@
 import { SaveAnimalController } from '@/presentation/controllers'
-import { badRequest, ok } from '@/presentation/helpers'
+import { badRequest, ok, serverError } from '@/presentation/helpers'
+import { throwError } from '@/tests/domain/helpers'
 import { SaveAnimalSpy, ValidatorSpy } from '@/tests/presentation/mocks'
 
 import faker from 'faker'
@@ -63,5 +64,12 @@ describe('SaveAnimalController', () => {
     const { sut, saveAnimalSpy } = makeSut()
     const response = await sut.handle(request)
     expect(response).toEqual(ok(saveAnimalSpy.result))
+  })
+
+  test('Should returns serverError if SaveAnimal throws', async () => {
+    const { sut, saveAnimalSpy } = makeSut()
+    jest.spyOn(saveAnimalSpy, 'save').mockImplementationOnce(throwError)
+    const response = await sut.handle(request)
+    expect(response).toEqual(serverError(new Error()))
   })
 })
