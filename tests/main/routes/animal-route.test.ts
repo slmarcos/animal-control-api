@@ -35,5 +35,18 @@ describe('Animal Routes', () => {
           error: 'Missing param: name'
         })
     })
+
+    test('Should return 200 and AnimalModel on success', async () => {
+      const mockRequest = {
+        name: faker.name.findName(),
+        age: faker.random.number(99),
+        type: faker.random.word(),
+        weight: faker.random.float(1000)
+      }
+      await request(app)
+        .post('/api/animal')
+        .send(mockRequest)
+        .expect(200)
+    })
   })
 })
