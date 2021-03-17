@@ -1,9 +1,8 @@
 import { MongoDbAnimalModel } from '@/infra/db/models'
 import { SaveAnimalRepo } from '@/data/protocols'
-import { SaveAnimal } from '@/domain/use-cases'
 
 export class MongoDbSaveAnimalRepo implements SaveAnimalRepo {
-  async save (data: SaveAnimal.Params): Promise<SaveAnimalRepo.Result> {
+  async save (data: SaveAnimalRepo.Params): Promise<SaveAnimalRepo.Result> {
     let animal = await MongoDbAnimalModel.findById(data.id)
     if (!animal) {
       animal = await MongoDbAnimalModel.create(data)
