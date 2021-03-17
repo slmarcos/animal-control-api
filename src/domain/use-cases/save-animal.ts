@@ -6,6 +6,7 @@ export interface SaveAnimal {
 
 export namespace SaveAnimal {
   export type Params = {
+    id?: string
     name: string
     age: number
     weight: number

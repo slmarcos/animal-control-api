@@ -14,7 +14,11 @@ export class SaveAnimalController implements Controller {
       if (error) {
         return badRequest(error)
       }
-      const animal = await this.saveAnimal.save(request)
+      const { animalId: id, ...params } = request
+      const animal = await this.saveAnimal.save({
+        id,
+        ...params
+      })
       return ok(animal)
     } catch (error) {
       return serverError(error)

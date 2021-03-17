@@ -4,9 +4,18 @@ import { SaveAnimal } from '@/domain/use-cases'
 
 export class MongoDbSaveAnimalRepo implements SaveAnimalRepo {
   async save (data: SaveAnimal.Params): Promise<SaveAnimalRepo.Result> {
-    const animal = await MongoDbAnimalModel.create(data)
+    let animal = await MongoDbAnimalModel.findById(data.id)
+    if (!animal) {
+      animal = await MongoDbAnimalModel.create(data)
+    } else {
+      animal.name = data.name
+      animal.age = data.age
+      animal.weight = data.weight
+      animal.type = data.type
+      await animal.save()
+    }
     return {
-      id: animal._id,
+      id: animal.id,
       name: animal.name,
       age: animal.age,
       weight: animal.weight,
