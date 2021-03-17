@@ -36,4 +36,18 @@ describe('MongoDbSaveAnimalRepo', () => {
     expect(animal).toBeTruthy()
     expect(animal.name).toBe(animalParams.name)
   })
+
+  test('Should return updated AnimalModel if animal id is provided and exists', async () => {
+    const { sut } = makeSut()
+    const animalParams = mockSaveAnimalParams()
+    const animal = await sut.save(animalParams)
+    const result = await sut.save({
+      id: animal.id,
+      ...animalParams,
+      name: 'other_valid_name'
+    })
+    expect(result.id).toBe(animal.id)
+    expect(result.name).toBe('other_valid_name')
+    expect(result.type).toBe(animal.type)
+  })
 })

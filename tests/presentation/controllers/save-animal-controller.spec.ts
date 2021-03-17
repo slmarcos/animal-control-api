@@ -11,7 +11,8 @@ type SutTypes = {
   saveAnimalSpy: SaveAnimalSpy
 }
 
-const mockRequest = (): SaveAnimalController.Request => ({
+const mockRequest = (animalId?: string): SaveAnimalController.Request => ({
+  animalId: animalId,
   age: faker.random.number(99),
   name: faker.name.firstName(),
   type: faker.random.word(),
@@ -53,6 +54,20 @@ describe('SaveAnimalController', () => {
     const { sut, saveAnimalSpy } = makeSut()
     await sut.handle(request)
     expect(saveAnimalSpy.params).toEqual({
+      id: request.animalId,
+      age: request.age,
+      name: request.name,
+      type: request.type,
+      weight: request.weight
+    })
+  })
+
+  test('Should call SaveAnimal with correct params when animalId exists', async () => {
+    const { sut, saveAnimalSpy } = makeSut()
+    request.animalId = faker.random.uuid()
+    await sut.handle(request)
+    expect(saveAnimalSpy.params).toEqual({
+      id: request.animalId,
       age: request.age,
       name: request.name,
       type: request.type,
