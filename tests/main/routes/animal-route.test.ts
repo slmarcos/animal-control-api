@@ -104,16 +104,11 @@ describe('Animal Routes', () => {
     })
 
     test('[PUT] Should returns status code 200 and updated AnimalModel on success', async () => {
-      const mockAnimal = {
-        name: faker.name.firstName(),
-        age: 12,
-        type: faker.random.word(),
-        weight: 100
-      }
-      const animal = await MongoDbAnimalModel.create(mockAnimal)
+      const animalParams = mockAnimal()
+      const animal = await MongoDbAnimalModel.create(animalParams)
       const animalId: string = animal.id
       const mockRequest = {
-        ...mockAnimal,
+        ...animalParams,
         name: 'other_valid_name'
       }
       await request(app)
@@ -147,22 +142,17 @@ describe('Animal Routes', () => {
     })
 
     test('[GET] Should returns status code 200 and AnimalModel on success', async () => {
-      const mockAnimal = {
-        name: faker.name.firstName(),
-        age: 12,
-        type: faker.random.word(),
-        weight: 100
-      }
-      const animal = await MongoDbAnimalModel.create(mockAnimal)
+      const animalParams = mockAnimal()
+      const animal = await MongoDbAnimalModel.create(animalParams)
       const animalId: string = animal.id
       await request(app)
         .get(`/api/animal/${animalId}`)
         .expect(200, {
           id: animalId,
-          name: mockAnimal.name,
-          age: mockAnimal.age,
-          type: mockAnimal.type,
-          weight: mockAnimal.weight
+          name: animalParams.name,
+          age: animalParams.age,
+          type: animalParams.type,
+          weight: animalParams.weight
         })
     })
   })
