@@ -9,6 +9,7 @@ const port = env.port
 const server = http.createServer(app)
 
 const onListening = (): void => {
+  console.log(`[${new Date().toISOString()}]`, 'App running in', process.env.NODE_ENV, 'mode')
   console.log(`[${new Date().toISOString()}]`, `Server running on port: ${env.port}`)
 }
 
@@ -31,6 +32,6 @@ const onError = (error: NodeJS.ErrnoException): void => {
 server.on('listening', onListening)
 server.on('error', onError)
 
-MongoHelper.connect(env.mongoUrl!)
+MongoHelper.connect(env.mongoUrl)
   .then(() => server.listen(port))
   .catch((err) => console.error(err))

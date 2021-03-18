@@ -1,0 +1,42 @@
+version: "3.8"
+services:
+  dev-api:
+    image: node:14-alpine
+    container_name: "dev-animal-control-api"
+    working_dir: /usr/src/app
+    command: sh -c "npm install --only=prod && npm run debug"
+    env_file:
+      - ./.env
+    environment:
+      - NODE_ENV=development
+      - MONGO_URL=mongodb://dev-mongodb:27017/animal-control
+    volumes:
+      - ./dist/:/usr/src/app/dist/
+      - ./package.json:/usr/src/app/package.json
+    networks:
+      - dev-custom-network
+    ports:
+      - "${PORT}:${PORT}"
+      - 9222:9222
+    depends_on:
+      - dev-mongodb
+    restart: on-failure
+
+  dev-mongodb:
+    image: mongo
+    container_name: dev-animal-control-mongodb
+    networks:
+      - dev-custom-network
+    volumes:
+      - dev-mongodb-data:/data/db
+    ports:
+      - 27017:27017
+    restart: on-failure
+
+networks:
+  dev-custom-network:
+    driver: bridge
+
+volumes:
+  dev-mongodb-data:
+    name: dev-mongodb-data

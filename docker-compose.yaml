@@ -1,0 +1,34 @@
+version: "3.8"
+services:
+  prod-api:
+    build: .
+    image: animal-control-api
+    container_name: prod-animal-control-api
+    env_file:
+      - ./.env
+    networks:
+      - prod-custom-network
+    ports:
+      - "${PORT}:${PORT}"
+    depends_on:
+      - prod-mongodb
+    restart: on-failure
+
+  prod-mongodb:
+    image: mongo
+    container_name: prod-animal-control-mongodb
+    networks:
+      - prod-custom-network
+    volumes:
+      - prod-mongodb-data:/data/db
+    ports:
+      - 27017:27017
+    restart: on-failure
+
+networks:
+  prod-custom-network:
+    driver: bridge
+
+volumes:
+  prod-mongodb-data:
+    name: prod-mongodb-data
