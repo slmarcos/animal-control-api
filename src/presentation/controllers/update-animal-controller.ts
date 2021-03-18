@@ -16,11 +16,9 @@ export class UpdateAnimalController implements Controller {
         return badRequest(error)
       }
       const { animalId, ...params } = request
-      if (animalId) {
-        const animal = await this.loadAnimalById.load(animalId)
-        if (!animal) {
-          return noContent()
-        }
+      const animal = await this.loadAnimalById.load(animalId)
+      if (!animal) {
+        return noContent()
       }
       const result = await this.saveAnimal.save({
         id: animalId,
