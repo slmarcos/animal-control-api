@@ -9,6 +9,13 @@ import mongoose from 'mongoose'
 
 const MONGO_URL = process.env.MONGO_URL as string
 
+const mockAnimal = () => ({
+  name: faker.name.firstName(),
+  age: 12,
+  type: faker.random.word(),
+  weight: 100
+})
+
 describe('Animal Routes', () => {
   beforeAll(async () => {
     await MongoHelper.connect(MONGO_URL)
@@ -22,7 +29,7 @@ describe('Animal Routes', () => {
     await MongoDbAnimalModel.deleteMany({})
   })
 
-  describe('[POST] /animal', () => {
+  describe('[POST] /api/animal', () => {
     test('[POST] Should returns status code 400 and missing param error if an animal attribute not send', async () => {
       const mockRequest = {
         age: 12,
@@ -51,7 +58,7 @@ describe('Animal Routes', () => {
     })
   })
 
-  describe('[PUT] /animal/:animalId', () => {
+  describe('[PUT] /api/animal/:animalId', () => {
     test('[PUT] Should returns status code 400 and missing param error if not send all animal attributes', async () => {
       const animalId = mongoose.Types.ObjectId().toHexString()
       const mockRequest = {
@@ -122,7 +129,7 @@ describe('Animal Routes', () => {
     })
   })
 
-  describe('[GET] /animal/:animalId', () => {
+  describe('[GET] /api/animal/:animalId', () => {
     test('[GET] Should returns status code 400 and invalid param error if an invalid animalId is provided', async () => {
       const animalId = faker.random.uuid()
       await request(app)
@@ -157,6 +164,33 @@ describe('Animal Routes', () => {
           type: mockAnimal.type,
           weight: mockAnimal.weight
         })
+    })
+  })
+
+  describe('[GET] /api/animals', () => {
+    test('[GET] Should returns status code 200 and empty array of AnimalModel on success', async () => {
+      await request(app)
+        .get('/api/animals')
+        .expect(200, [])
+    })
+
+    test('[GET] Should returns status code 200 and array of AnimalModel on success', async () => {
+      const fistAnimalParams = mockAnimal()
+      const secondAnimalParams = mockAnimal()
+      const firstAnimal = await MongoDbAnimalModel.create(fistAnimalParams)
+      const secondAnimal = await MongoDbAnimalModel.create(secondAnimalParams)
+      await request(app)
+        .get('/api/animals')
+        .expect(200, [
+          {
+            id: firstAnimal.id,
+            ...fistAnimalParams
+          },
+          {
+            id: secondAnimal.id,
+            ...secondAnimalParams
+          }
+        ])
     })
   })
 })
